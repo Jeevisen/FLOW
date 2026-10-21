@@ -71,6 +71,8 @@ FLOW/
 
 ## Notes
 
+[Flow Video Demo](https://drive.google.com/file/d/1RhsiO9vxmPizK02ziXEb9B5RhnALyKom/view?usp=sharing)
+
 This is a personal project I built to practice full-stack development, particularly connecting a React frontend to a PostgreSQL database through Supabase.
 
 FLOW isn't connected to real bank accounts. All financial information is manually entered, and balances are calculated based on the transactions recorded in the app.

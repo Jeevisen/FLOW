@@ -40,19 +40,23 @@ function SignUp() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Hide notifications after 3 seconds
   useEffect(() => {
     if (!error) return;
 
-    const timer = setTimeout(() => {
-      setError("");
-    }, 5000);
-
+    const timer = setTimeout(() => setError(""), 3000);
     return () => clearTimeout(timer);
   }, [error]);
 
+  useEffect(() => {
+    if (!success) return;
+
+    const timer = setTimeout(() => setSuccess(""), 3000);
+    return () => clearTimeout(timer);
+  }, [success]);
+
   const handleSignUp = async (e) => {
     e.preventDefault();
-
     if (loading) return;
 
     setLoading(true);
@@ -73,20 +77,15 @@ function SignUp() {
 
       if (error) throw error;
 
-      if (data.session) {
-        setSuccess(
-          "Account created successfully! You can now log in."
-        );
-      } else {
-        setSuccess(
-          "Please check your email to confirm your account before logging in."
-        );
-      }
+      setSuccess(
+        data.session
+          ? "Account created successfully!"
+          : "Check your email to confirm."
+      );
 
       setPassword("");
-
     } catch (error) {
-      console.error("Sign up failed:", error.message);
+      console.error("Sign up failed:", error);
       setError(error.message || "Unable to create account.");
     } finally {
       setLoading(false);
@@ -101,97 +100,81 @@ function SignUp() {
         loop
         muted
         playsInline
-        className="fixed inset-0 w-full h-full object-cover">
+        className="fixed inset-0 w-full h-full object-cover"
+      >
         <source src="/bg.mp4" type="video/mp4" />
       </motion.video>
 
       <motion.div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
 
         <motion.div
-          className="
-            relative
-            w-full max-w-[500px]
-            rounded-2xl
-            bg-zinc-900/95
-            p-6 sm:p-10
-            text-white
-            shadow-2xl">
-
+          className="relative w-full max-w-[500px] rounded-2xl bg-zinc-900/95 p-6 sm:p-10 text-white shadow-2xl"
+        >
           <motion.div
             className="flex flex-col items-start gap-4 w-full"
             variants={parentVariants}
             initial="hidden"
-            animate="visible">
+            animate="visible"
+          >
 
-            <motion.img
-              className="w-20 sm:w-24 md:w-28 h-auto"
-              src="/logo.png"
-              alt="FLOW logo"
-              variants={childVariants}/>
+            <motion.div className="relative" variants={childVariants}>
+              <motion.img
+                className="w-20 sm:w-24 md:w-28 h-auto"
+                src="/logo.png"
+                alt="FLOW logo"
+              />
+
+              <AnimatePresence>
+                {error && (
+                  <motion.p
+                    key="signup-error"
+                    role="alert"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute left-full top-[-6px] ml-3 sm:ml-5 text-xs text-red-300 font-extrabold bg-zinc-800 border border-red-500/40 rounded-lg px-3 sm:px-4 py-3 w-[170px] sm:w-[240px] max-w-[calc(100vw-9rem)] shadow-lg break-words"
+                  >
+                    {error}
+                  </motion.p>
+                )}
+
+                {success && (
+                  <motion.p
+                    key="signup-success"
+                    role="status"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute left-full top-[-6px] ml-3 sm:ml-5 text-xs text-green-300 font-extrabold bg-zinc-800 border border-green-500/40 rounded-lg px-3 sm:px-4 py-3 w-[170px] sm:w-[240px] max-w-[calc(100vw-9rem)] shadow-lg break-words"
+                  >
+                    {success}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </motion.div>
 
             <motion.p
               className="text-gray-400 text-sm sm:text-base mt-0.5 font-extrabold"
-              variants={childVariants}>
+              variants={childVariants}
+            >
               Take control of your money...
             </motion.p>
 
             <motion.h1
               className="text-white text-sm sm:text-base mt-0.5 font-extrabold"
-              variants={childVariants}>
+              variants={childVariants}
+            >
               Create an account →
             </motion.h1>
 
-            <AnimatePresence mode="wait">
-              {error && (
-                <motion.p
-                  key="signup-error"
-                  role="alert"
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.25 }}
-                  className="
-                    w-full
-                    text-xs text-red-300
-                    bg-red-500/10
-                    border border-red-500/30
-                    rounded-xl
-                    px-4 py-3
-                    break-words">
-                  {error}
-                </motion.p>
-              )}
-            </AnimatePresence>
-
-            <AnimatePresence mode="wait">
-              {success && (
-                <motion.p
-                  key="signup-success"
-                  role="status"
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.25 }}
-                  className="
-                    w-full
-                    text-xs text-green-300
-                    bg-green-500/10
-                    border border-green-500/30
-                    rounded-xl
-                    px-4 py-3
-                    break-words">
-                  {success}
-                </motion.p>
-              )}
-            </AnimatePresence>
-
-            <form
-              onSubmit={handleSignUp}
-              className="flex flex-col gap-4 w-full">
+            <form onSubmit={handleSignUp} className="flex flex-col gap-4 w-full">
 
               <motion.div
                 className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full"
-                variants={childVariants}>
+                variants={childVariants}
+              >
 
                 <motion.input
                   type="text"
@@ -202,14 +185,9 @@ function SignUp() {
                   disabled={loading}
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  whileHover={{ scale: 1.02 }}
-                  className="
-                    w-full min-w-0
-                    text-sm bg-zinc-800 text-white
-                    rounded-full px-4 py-3
-                    outline-none
-                    focus:ring-2 focus:ring-white/30
-                    disabled:opacity-50"/>
+                  whileHover={{ scale: 1.09 }}
+                  className="w-full min-w-0 text-sm bg-zinc-800 text-white rounded-full px-4 py-3 outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50"
+                />
 
                 <motion.input
                   type="text"
@@ -220,14 +198,9 @@ function SignUp() {
                   disabled={loading}
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  whileHover={{ scale: 1.02 }}
-                  className="
-                    w-full min-w-0
-                    text-sm bg-zinc-800 text-white
-                    rounded-full px-4 py-3
-                    outline-none
-                    focus:ring-2 focus:ring-white/30
-                    disabled:opacity-50"/>
+                  whileHover={{ scale: 1.09 }}
+                  className="w-full min-w-0 text-sm bg-zinc-800 text-white rounded-full px-4 py-3 outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50"
+                />
 
                 <motion.input
                   type="email"
@@ -238,14 +211,9 @@ function SignUp() {
                   disabled={loading}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  whileHover={{ scale: 1.02 }}
-                  className="
-                    sm:col-span-2 w-full min-w-0
-                    text-sm bg-zinc-800 text-white
-                    rounded-full px-4 py-3
-                    outline-none
-                    focus:ring-2 focus:ring-white/30
-                    disabled:opacity-50"/>
+                  whileHover={{ scale: 1.09 }}
+                  className="sm:col-span-2 w-full min-w-0 text-sm bg-zinc-800 text-white rounded-full px-4 py-3 outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50"
+                />
 
                 <motion.input
                   type="password"
@@ -257,47 +225,34 @@ function SignUp() {
                   disabled={loading}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  whileHover={{ scale: 1.02 }}
-                  className="
-                    sm:col-span-2 w-full min-w-0
-                    text-sm bg-zinc-800 text-white
-                    rounded-full px-4 py-3
-                    outline-none
-                    focus:ring-2 focus:ring-white/30
-                    disabled:opacity-50"/>
+                  whileHover={{ scale: 1.09 }}
+                  className="sm:col-span-2 w-full min-w-0 text-sm bg-zinc-800 text-white rounded-full px-4 py-3 outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50"
+                />
 
               </motion.div>
 
-              <motion.div
-                className="flex flex-wrap items-center gap-3 pt-1">
+              <motion.div className="flex flex-wrap items-center gap-3 pt-1">
 
                 <motion.button
                   type="submit"
                   disabled={loading}
                   variants={childVariants}
-                  className="
-                    text-sm
-                    bg-zinc-800 text-white
-                    rounded-full px-4 py-3
-                    hover:bg-white hover:text-black
-                    disabled:opacity-50
-                    disabled:cursor-not-allowed
-                    transition-colors"
+                  className="text-sm bg-zinc-800 text-white rounded-full px-4 py-3 hover:bg-white hover:text-black disabled:opacity-50 transition-colors"
                   whileTap={{ scale: 0.98 }}
-                  whileHover={loading ? {} : { scale: 1.05 }}>
-                  {loading ? "Creating account..." : "Sign Up"}
+                  whileHover={{ scale: loading ? 1 : 1.09 }}
+                >
+                  Submit
                 </motion.button>
 
-                <motion.p
-                  className="text-white text-sm"
-                  variants={childVariants}>
+                <motion.p className="text-white text-sm" variants={childVariants}>
                   Already have an account?
                 </motion.p>
 
                 <MotionLink
                   to="/login"
                   variants={childVariants}
-                  className="text-white underline text-sm">
+                  className="text-white underline text-sm"
+                >
                   Login
                 </MotionLink>
 
